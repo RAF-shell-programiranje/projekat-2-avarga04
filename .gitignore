@@ -22,3 +22,11 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+Projekat-2-VM_key.pem
+projekat2.pub
+terraform.tfstate.1767037875.backup
+terraform.tfstate.1767037879.backup
+terraform.tfstate.backup
+tfplan
+.terraform/providers/registry.terraform.io/hashicorp/azurerm/4.57.0/linux_amd64/LICENSE.txt
+.terraform/providers/registry.terraform.io/hashicorp/azurerm/4.57.0/linux_amd64/terraform-provider-azurerm_v4.57.0_x5
