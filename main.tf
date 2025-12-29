@@ -46,6 +46,14 @@ resource "azurerm_public_ip" "pubip" {
   allocation_method   = "Static"
 }
 
+resource "azurerm_public_ip" "pubip2" {
+  name                = "${var.prefix}-pubip2"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+}
+
+
 resource "azurerm_network_interface" "nic" {
   name                = "${var.prefix}-nic"
   location            = azurerm_resource_group.rg.location
@@ -59,6 +67,19 @@ resource "azurerm_network_interface" "nic" {
     public_ip_address_id          = azurerm_public_ip.pubip.id
   }
 }
+resource "azurerm_network_interface" "nic2" {
+  name                = "${var.prefix}-nic2"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    private_ip_address            = "10.0.1.8"
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Static"
+    public_ip_address_id          = azurerm_public_ip.pubip2.id
+  }
+}
 
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = "Projekat-2-VM"
@@ -67,6 +88,39 @@ resource "azurerm_linux_virtual_machine" "vm" {
   size                = var.vm_size
   admin_username      = var.admin_username
   network_interface_ids = [azurerm_network_interface.nic.id]
+
+  os_disk {
+    caching              = "ReadWrite"
+    
+    storage_account_type = "Premium_LRS"
+    disk_size_gb         = var.os_disk_size_gb
+  }
+
+  source_image_reference {
+    
+    publisher = "canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
+    version   = "latest"
+  }
+
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = file(var.admin_ssh_public_key_path)
+  }
+
+  tags = {
+    environment = "dev"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "vm2" {
+  name                = "Projekat-2-VM2"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  size                = var.vm_size
+  admin_username      = var.admin_username
+  network_interface_ids = [azurerm_network_interface.nic2.id]
 
   os_disk {
     caching              = "ReadWrite"
