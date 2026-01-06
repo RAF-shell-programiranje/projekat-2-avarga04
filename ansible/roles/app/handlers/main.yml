@@ -1,0 +1,10 @@
+---
+- name: Reload systemd
+  command: systemctl daemon-reload
+  become: yes
+
+- name: Restart project2 service
+  systemd:
+    name: project2.service
+    state: restarted
+  become: yes

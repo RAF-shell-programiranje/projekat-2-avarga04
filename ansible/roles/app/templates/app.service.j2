@@ -1,0 +1,15 @@
+[Unit]
+Description=Project2 dummy Java service
+After=network.target
+
+[Service]
+Type=simple
+User=project2
+Group=project2
+WorkingDirectory=/opt/project2
+ExecStart=/usr/bin/java -jar /opt/project2/project2_dummy_service-1.0-SNAPSHOT.jar
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

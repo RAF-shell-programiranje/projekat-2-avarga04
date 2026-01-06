@@ -1,0 +1,5 @@
+- hosts: appservers
+  become: yes
+  gather_facts: yes
+  roles:
+    - app

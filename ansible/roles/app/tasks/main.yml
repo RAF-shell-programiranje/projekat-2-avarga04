@@ -1,0 +1,64 @@
+---
+- name: Install OpenJDK on Debian/Ubuntu
+  apt:
+    name: openjdk-11-jdk
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Install OpenJDK on RedHat/CentOS
+  yum:
+    name: java-11-openjdk-devel
+    state: present
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Ensure application user exists
+  user:
+    name: project2
+    system: yes
+    create_home: no
+
+- name: Create application directory
+  file:
+    path: /opt/project2
+    state: directory
+    owner: project2
+    group: project2
+    mode: '0755'
+
+- name: Copy application JAR to target
+  copy:
+    src: project2_dummy_service-1.0-SNAPSHOT.jar
+    dest: /opt/project2/project2_dummy_service-1.0-SNAPSHOT.jar
+    owner: project2
+    group: project2
+    mode: '0755'
+
+- name: Create systemd unit from template
+  template:
+    src: app.service.j2
+    dest: /etc/systemd/system/project2.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
+
+- name: Ensure service is enabled and started
+  systemd:
+    name: project2.service
+    enabled: yes
+    state: started
+
+- name: Check service is active
+  command: systemctl is-active project2.service
+  register: service_active
+  retries: 10
+  delay: 3
+  until: service_active.stdout.find('active') != -1
+  changed_when: false
+
+- name: Show last journal lines for project2 if it failed to start
+  command: journalctl -u project2.service -n 50 --no-pager
+  register: project2_journal
+  when: service_active.stdout.find('active') == -1
+  changed_when: false

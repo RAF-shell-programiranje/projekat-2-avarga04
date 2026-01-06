@@ -13,7 +13,7 @@ resource "azurerm_virtual_network" "vnet" {
   depends_on = [azurerm_resource_group.rg]
 }
 
-/*resource "azurerm_network_security_group" "nsg" {
+resource "azurerm_network_security_group" "nsg" {
   name                = "${var.prefix}-nsg"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -29,15 +29,26 @@ resource "azurerm_virtual_network" "vnet" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-}*/
+}
 
 resource "azurerm_subnet" "subnet" {
   name                 = "${var.prefix}-subnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
-  //network_security_group_id = azurerm_network_security_group.nsg.id
+  #network_security_group_id = azurerm_network_security_group.nsg.id
 }
+
+resource "azurerm_network_interface_security_group_association" "nic_nsg_assoc" {
+  network_interface_id      = azurerm_network_interface.nic.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
+resource "azurerm_network_interface_security_group_association" "nic2_nsg_assoc" {
+  network_interface_id      = azurerm_network_interface.nic2.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
 
 resource "azurerm_public_ip" "pubip" {
   name                = "${var.prefix}-pubip"
@@ -66,6 +77,7 @@ resource "azurerm_network_interface" "nic" {
     private_ip_address_allocation = "Static"
     public_ip_address_id          = azurerm_public_ip.pubip.id
   }
+  
 }
 resource "azurerm_network_interface" "nic2" {
   name                = "${var.prefix}-nic2"
