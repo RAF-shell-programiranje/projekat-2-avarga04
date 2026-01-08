@@ -52,7 +52,7 @@
 - name: Check service is active
   command: systemctl is-active project2.service
   register: service_active
-  retries: 10
+  retries: 30
   delay: 3
   until: service_active.stdout.find('active') != -1
   changed_when: false

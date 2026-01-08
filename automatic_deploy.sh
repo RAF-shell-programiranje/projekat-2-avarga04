@@ -13,8 +13,11 @@ echo "Odabrani mod: $MODE"
 
 case "$MODE" in
     --provision)
+        terraform init -upgrade
         terraform plan -out=tfplan
         terraform apply -auto-approve tfplan
+        sed -i "s/ansible_host=.*/ansible_host=IP_PLACEHOLDER/" ansible/inventory.ini
+        sed -i "s/IP_PLACEHOLDER/$(terraform output -raw public_ip)/" ansible/inventory.ini
         echo "Ip adrese VM-ova:"
         echo "VM1:"
         echo "10.0.1.4"
