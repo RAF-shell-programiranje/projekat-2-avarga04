@@ -32,3 +32,4 @@ tfplan
 terraform.tfstate
 terraform.tfstate
 .terraform/providers/registry.terraform.io/hashicorp/local/2.6.1/linux_amd64/LICENSE.txt
+terraform.tfstate

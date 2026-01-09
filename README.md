@@ -1,34 +1,56 @@
-# Terraform Azure VM
+# Automatizovani deployment aplikacije i monitoring sistema
 
-This folder contains a minimal Terraform configuration to deploy a single Linux VM on Azure.
+## Opis rešenja i arhitekture
 
-Files added:
-- `provider.tf` — provider configuration
-- `variables.tf` — input variables and defaults
-- `main.tf` — resources: resource group, vnet, subnet, nsg, public ip, nic, VM
-- `outputs.tf` — useful outputs (public IP, vm name)
+Projekat predstavlja automatizovano rešenje za kreiranje infrastrukture i deploy
+aplikacije korišćenjem alata **Terraform**, **Ansible** i **Bash skripte**.
 
-Quick start
-1. Install Terraform 1.x and authenticate to Azure (e.g. `az login` or use a service principal).
-2. Optionally update `variables.tf` defaults or pass variables via `-var` or a `terraform.tfvars` file.
-3. Initialize and apply:
+Terraform se koristi za kreiranje cloud infrastrukture (virtuelna mašina,
+mrežni resursi i javna IP adresa), dok se Ansible koristi za konfiguraciju
+virtuelne mašine i deploy Java aplikacije kao sistemskog servisa.
+
+Bash skripta `automatic_deploy.sh` predstavlja glavnu ulaznu tačku projekta i
+automatizuje ceo proces – od kreiranja infrastrukture do deploy-a aplikacije.
+Na ovaj način obezbeđen je brz, ponovljiv i automatizovan deployment bez ručne
+konfiguracije.
+
+## Uputstvo za pokretanje glavne skripte
+
+Skripta se pokreće iz root direktorijuma projekta:
 
 ```bash
-terraform init
-terraform apply -var="admin_ssh_public_key_path=$HOME/.ssh/id_rsa.pub" -auto-approve
-```
+./automatic_deploy.sh <mod>
 
-Notes
-- The default SSH public key path is `~/.ssh/id_rsa.pub`. Replace with your public key path.
-- Default location is `West Europe`. Change `var.location` if needed.
-- This is intentionally minimal — add storage, extensions, tags, or bootstrapping as needed.
 
-Security
-- The example opens port 22 to the world. For production, restrict `source_address_prefix` in the NSG.
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/32TZnzb7)
-# Upustvo pokrentanja
+Ako se skripta pokrene bez parametara, ispisuje se poruka sa dostupnim režimima rada:
 
-Pokrecete ga pomocu: java -jar project2_dummy_service-1.0-SNAPSHOT.jar <log_location> <number_of_agents>
+Usage: ./automatic_deploy.sh {provision|deploy|check-status|monitor|teardown}
 
-<log_location> - lokacija log fajla (default: logs/app.log)
-<number_of_agents> - broj agenata koji se pokreću paralelno (default: 500)
+Režimi rada
+
+provision
+Kreira infrastrukturu korišćenjem Terraform-a
+Preuzima IP adresu virtuelne mašine
+Automatski ažurira Ansible inventory.ini fajl
+
+deploy
+Pokreće Ansible playbook
+Instalira potrebne pakete i deploy-uje aplikaciju na VM
+
+check-status
+Predviđen za proveru statusa sistema (trenutno placeholder)
+
+monitor
+Predviđen za monitoring aplikacije (trenutno placeholder)
+
+teardown
+Briše kompletnu infrastrukturu korišćenjem Terraform-a
+
+Dodatne informacije
+
+IP adresa virtuelne mašine se automatski ažurira u Ansible inventory fajlu
+nakon provisioninga.
+
+Za povezivanje na VM koristi se SSH autentifikacija pomoću privatnog ključa.
+
+Skriptu je potrebno pokretati iz root direktorijuma projekta.
